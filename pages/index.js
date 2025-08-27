@@ -167,11 +167,14 @@ export default function Home() {
         </div>
       )}
       <div className="footer-spacer" />
-      <div className="actions">
-        <button onClick={openCheckout} disabled={!cart?.checkoutUrl}>
-          Перейти к оплате
-        </button>
-      </div>
+      <div className="actions two">
+  <button onClick={() => (window.location.href = '/cart')}>
+    Корзина {cart?.totalQuantity ? `(${cart.totalQuantity})` : ''}
+  </button>
+  <button onClick={openCheckout} disabled={!cart?.checkoutUrl}>
+    Перейти к оплате
+  </button>
+</div>
       <script src="https://telegram.org/js/telegram-web-app.js"></script>
     </main>
   );
