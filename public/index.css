@@ -40,3 +40,18 @@ button { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weig
   opacity: .5;
   cursor: default;
 }
+/* Корзина */
+.cart-list { display: grid; gap: 10px; margin-top: 10px; }
+.cart-item { display: grid; grid-template-columns: 90px 1fr; gap: 10px; border: 1px solid rgba(0,0,0,.08); border-radius: 10px; padding: 10px; background: rgba(255,255,255,.8); }
+.cart-item img { width: 90px; height: 90px; object-fit: cover; border-radius: 8px; }
+.cart-info { display: grid; gap: 6px; align-content: start; }
+.cart-title { font-weight: 700; font-size: 14px; }
+.cart-variant { font-size: 12px; opacity: .7; }
+.cart-price { font-weight: 600; }
+.remove-btn { padding: 8px 10px; border: 1px solid rgba(0,0,0,.15); background: white; border-radius: 8px; cursor: pointer; }
+
+.cart-summary { position: sticky; bottom: 0; left: 0; right: 0; padding: 10px; background: rgba(255,255,255,.9); backdrop-filter: blur(8px); margin-top: 10px; border-top: 1px solid rgba(0,0,0,.08); }
+.cart-summary .sum { font-weight: 800; margin-bottom: 8px; }
+.cart-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.actions.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
