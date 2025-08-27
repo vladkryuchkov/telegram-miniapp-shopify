@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-const PRODUCTS_LIMIT = parseInt(process.env.NEXT_PUBLIC_PRODUCTS_LIMIT || process.env.PRODUCTS_LIMIT || "12", 10);
-
 async function gql(query, variables) {
   const res = await fetch("/api/storefront", {
     method: "POST",
@@ -11,6 +9,48 @@ async function gql(query, variables) {
   return res.json();
 }
 
+// пагинированный запрос: берем по 100 за раз, пока hasNextPage = false
+const PRODUCTS_PAGED_QUERY = `#graphql
+  query ProductsPaged($first: Int!, $after: String) {
+    products(first: $first, after: $after, sortKey: TITLE) {
+      edges {
+        cursor
+        node {
+          id
+          title
+          handle
+          featuredImage { url altText }
+          variants(first: 1) {
+            edges { node { id title price { amount currencyCode } } }
+          }
+        }
+      }
+      pageInfo { hasNextPage endCursor }
+    }
+  }
+`;
+
+async function fetchAllProducts() {
+  const first = 100; // можно 250 — это максимум для Storefront на products
+  let after = null;
+  let all = [];
+
+  // защитимся от «бесконечного» цикла
+  for (let i = 0; i < 100; i++) {
+    const data = await gql(PRODUCTS_PAGED_QUERY, { first, after });
+    const conn = data?.data?.products;
+    const edges = conn?.edges || [];
+    all = all.concat(edges.map(e => e.node));
+
+    if (conn?.pageInfo?.hasNextPage) {
+      after = conn.pageInfo.endCursor;
+    } else {
+      break;
+    }
+  }
+  return all;
+}
+
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(null);
@@ -18,25 +58,11 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      // fetch products (server-side proxy will add token)
-      const query = `#graphql
-        query P($first:Int!) {
-          products(first:$first, sortKey:TITLE) {
-            edges {
-              node {
-                id title handle
-                featuredImage { url altText }
-                variants(first:1) { edges { node { id title price { amount currencyCode } } } }
-              }
-            }
-          }
-        }
-      `;
-      const data = await gql(query, { first: PRODUCTS_LIMIT });
-      const list = data?.data?.products?.edges?.map(e => e.node) || [];
+      // 1) тянем все товары со всеми страницами
+      const list = await fetchAllProducts();
       setProducts(list);
 
-      // restore cart
+      // 2) восстанавливаем корзину, если была
       const saved = localStorage.getItem("cartId");
       if (saved) setCart({ id: saved });
     })();
@@ -68,14 +94,14 @@ export default function Home() {
   }
 
   function openCheckout() {
-  if (!cart?.checkoutUrl) return;
-  // открываем Shopify Checkout прямо в том же окне Telegram Mini App
-  window.location.href = cart.checkoutUrl;
-}
+    if (!cart?.checkoutUrl) return;
+    // открываем чекаут в том же WebView Telegram
+    window.location.href = cart.checkoutUrl;
+  }
 
   return (
     <main>
-      <h1>Быстрый заказ — Мини‑магазин</h1>
+      <h1>Быстрый заказ — Мини-магазин</h1>
       {products.length === 0 ? <div className="empty">Загружаю товары…</div> : (
         <div className="grid">
           {products.map((p) => {
@@ -88,7 +114,7 @@ export default function Home() {
                 )}
                 <h3>{p.title}</h3>
                 <div className="price">{price ? `${price.amount} ${price.currencyCode}` : ""}</div>
-                <button disabled={loading} onClick={() => addToCart(variant.id)}>
+                <button disabled={loading || !variant?.id} onClick={() => addToCart(variant.id)}>
                   {loading ? "Добавление…" : "В корзину"}
                 </button>
               </div>
