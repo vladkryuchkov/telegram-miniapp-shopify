@@ -12,3 +12,31 @@ button { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weig
 .actions button { width: 100%; padding: 14px; }
 .empty { opacity: .7; text-align: center; padding: 40px 0; }
 .footer-spacer { height: 70px; }
+.qty {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  gap: 6px;
+  align-items: center;
+  margin: 8px 0 10px;
+}
+.qty-input {
+  width: 100%;
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 8px;
+  font-weight: 600;
+}
+.qty-btn {
+  padding: 10px 0;
+  border: 1px solid rgba(0,0,0,.15);
+  background: white;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.qty-btn:disabled {
+  opacity: .5;
+  cursor: default;
+}
