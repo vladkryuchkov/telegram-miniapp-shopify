@@ -68,13 +68,10 @@ export default function Home() {
   }
 
   function openCheckout() {
-    if (!cart?.checkoutUrl) return;
-    if (window.Telegram?.WebApp?.openLink) {
-      window.Telegram.WebApp.openLink(cart.checkoutUrl);
-    } else {
-      window.open(cart.checkoutUrl, "_blank");
-    }
-  }
+  if (!cart?.checkoutUrl) return;
+  // открываем Shopify Checkout прямо в том же окне Telegram Mini App
+  window.location.href = cart.checkoutUrl;
+}
 
   return (
     <main>
