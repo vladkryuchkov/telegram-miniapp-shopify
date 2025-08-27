@@ -69,6 +69,6 @@ button { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weig
 }
 
 .logo {
-  height: 80px;   /* увеличенный размер логотипа */
+  height: 100px;   /* увеличенный размер логотипа */
   width: auto;
 }
