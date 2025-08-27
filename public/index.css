@@ -57,12 +57,14 @@ button { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weig
 .actions.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .header {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  justify-content: center; /* центрируем по горизонтали */
+  padding: 16px 0;         /* отступ сверху и снизу */
   margin-bottom: 14px;
+  border-bottom: 1px solid rgba(0,0,0,.08); /* тонкая линия снизу, как у шапки */
+  background: white;       /* фон шапки */
 }
+
 .logo {
-  height: 40px;
+  height: 50px;  /* подберите оптимальную высоту */
   width: auto;
-  border-radius: 6px;
 }
