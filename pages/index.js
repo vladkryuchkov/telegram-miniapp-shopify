@@ -112,7 +112,9 @@ export default function Home() {
 
   return (
     <main>
-      <h1>Быстрый заказ — Мини-магазин</h1>
+      <div className="header">
+  <img src="/logo.png" alt="Логотип" className="logo" />
+</div>
       {products.length === 0 ? (
         <div className="empty">Загружаю товары…</div>
       ) : (
