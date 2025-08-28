@@ -170,14 +170,35 @@ export default function Home() {
         </div>
       )}
       <div className="footer-spacer" />
-      <div className="actions two">
-        <button onClick={() => (window.location.href = '/cart')}>
-          Cart {cart?.totalQuantity ? `(${cart.totalQuantity})` : ''}
-        </button>
-        <button onClick={openCheckout} disabled={!cart?.checkoutUrl}>
-          Go to checkout
-        </button>
-      </div>
+     <div className="bottom-spacer" />
+<nav className="bottom-nav" role="navigation" aria-label="Bottom navigation">
+  <a
+    className="nav-item"
+    href="/cart"
+    aria-label="Open cart"
+    onClick={(e) => { e.preventDefault(); window.location.href = '/cart'; }}
+  >
+    {/* SVG из public/ или fallback эмодзи */}
+    {typeof window !== 'undefined' && document?.createElement ? (
+      <img src="/cart.svg" alt="Cart" className="nav-icon" onError={(e)=>{e.currentTarget.outerHTML='🛒'}} />
+    ) : '🛒'}
+    <div className="nav-label">
+      Cart {cart?.totalQuantity ? `(${cart.totalQuantity})` : ''}
+    </div>
+  </a>
+
+  <a
+    className="nav-item"
+    href="#checkout"
+    aria-label="Go to checkout"
+    onClick={(e) => { e.preventDefault(); openCheckout(); }}
+  >
+    {typeof window !== 'undefined' && document?.createElement ? (
+      <img src="/checkout.svg" alt="Checkout" className="nav-icon" onError={(e)=>{e.currentTarget.outerHTML='💳'}} />
+    ) : '💳'}
+    <div className="nav-label">Checkout</div>
+  </a>
+</nav>
       <script src="https://telegram.org/js/telegram-web-app.js"></script>
     </main>
   );
