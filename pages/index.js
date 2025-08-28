@@ -99,10 +99,35 @@ export default function Home() {
     }
   }
 
-  function openCheckout() {
-    if (!cart?.checkoutUrl) return;
-    window.location.href = cart.checkoutUrl; // open inside Telegram WebView
+  function notify(text) {
+  // Нативный popup Telegram (в Mini App)
+  if (window.Telegram?.WebApp?.showPopup) {
+    window.Telegram.WebApp.showPopup({
+      title: "Oops",
+      message: text,
+      buttons: [{ type: "close" }],
+    });
+    return;
   }
+  // Альтернативы, если вдруг WebApp API недоступен
+  if (window.Telegram?.WebApp?.showAlert) {
+    window.Telegram.WebApp.showAlert(text);
+    return;
+  }
+  alert(text);
+}
+  function openCheckout() {
+   // если корзина пуста — показываем уведомление и выходим
+   if (!cart || !cart.totalQuantity) {
+     notify("Your cart is empty");
+     return;
+   }
+   if (!cart.checkoutUrl) {
+     notify("Checkout link is not ready yet");
+     return;
+   }
+   window.location.href = cart.checkoutUrl; // open inside Telegram WebView
+ }
 
   function changeQty(productId, value) {
     const v = Math.max(1, Math.min(999, Number(value) || 1));
