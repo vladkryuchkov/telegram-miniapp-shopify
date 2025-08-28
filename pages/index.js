@@ -69,18 +69,46 @@ export default function Home() {
   const [loadingId, setLoadingId] = useState(null);
   const [qty, setQty] = useState({}); // { [productId]: number }
 
-  useEffect(() => {
-    (async () => {
-      const list = await fetchAllProducts();
-      setProducts(list);
-      const q = {};
-      list.forEach(p => (q[p.id] = 1));
-      setQty(q);
+ useEffect(() => {
+  (async () => {
+    // 1) грузим каталог
+    const list = await fetchAllProducts();
+    setProducts(list);
+    const q = {};
+    list.forEach(p => (q[p.id] = 1));
+    setQty(q);
 
-      const saved = localStorage.getItem("cartId");
-      if (saved) setCart({ id: saved });
-    })();
-  }, []);
+    // 2) подтягиваем актуальную корзину из Shopify
+    const saved = localStorage.getItem("cartId");
+    if (saved) {
+      const fresh = await fetchCartById(saved);
+      if (fresh) setCart(fresh);
+      else setCart({ id: saved }); // fallback — хотя бы знать, что корзина есть
+    }
+  })();
+}, []);
+
+// 3) когда возвращаемся на страницу (из корзины или из чекаута), обновляем тотал
+useEffect(() => {
+  const refresh = async () => {
+    const saved = localStorage.getItem("cartId");
+    if (!saved) return;
+    const fresh = await fetchCartById(saved);
+    if (fresh) setCart(fresh);
+  };
+
+  // срабатывает при «возврате» на страницу
+  const onPageShow = () => refresh();
+  const onVisibility = () => { if (document.visibilityState === "visible") refresh(); };
+
+  window.addEventListener("pageshow", onPageShow);
+  document.addEventListener("visibilitychange", onVisibility);
+  return () => {
+    window.removeEventListener("pageshow", onPageShow);
+    document.removeEventListener("visibilitychange", onVisibility);
+  };
+}, []);
+
 
   async function ensureCart() {
     if (cart && cart.id) return cart.id;
