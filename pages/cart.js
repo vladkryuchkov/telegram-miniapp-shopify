@@ -34,8 +34,7 @@ export default function CartPage() {
     setLoadingId(lineId);
     try {
       const updated = await api("update", { cartId, lineId, quantity: qty });
-      const fresh = await api("get", { cartId: updated.id });
-      setCart(fresh);
+      setCart(updated); // в updated уже есть cost и lines
     } finally {
       setLoadingId(null);
     }
@@ -47,8 +46,7 @@ export default function CartPage() {
     setLoadingId(lineId);
     try {
       const updated = await api("remove", { cartId, lineId });
-      const fresh = await api("get", { cartId: updated.id });
-      setCart(fresh);
+      setCart(updated); // сразу обновляем сумму и список
     } finally {
       setLoadingId(null);
     }
