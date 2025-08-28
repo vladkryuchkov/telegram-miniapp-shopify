@@ -72,3 +72,34 @@ button { width: 100%; padding: 10px; border: none; border-radius: 8px; font-weig
   height: 60px;   /* увеличенный размер логотипа */
   width: auto;
 }
+.bottom-nav {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  background: white;
+  border-top: 1px solid rgba(0,0,0,.08);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  height: 64px;
+  z-index: 1000;
+}
+.nav-item {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  font-size: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+.nav-label { font-weight: 600; }
+.bottom-spacer { height: 70px; } /* чтобы контент не прятался за навбаром */
+
+/* Активное состояние (для страницы cart) */
+.nav-item.active .nav-label {
+  text-decoration: underline;
+}
