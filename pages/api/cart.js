@@ -1,6 +1,7 @@
 import { storefront, QUERIES } from "../../lib/shopify";
 
 export default async function handler(req, res) {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   try {
     if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
