@@ -33,9 +33,15 @@ export default function CartPage() {
   const qty = Math.max(1, Math.min(999, Number(nextQty) || 1));
   setLoadingId(lineId);
   try {
-    await api("update", { cartId, lineId, quantity: qty });
-    const fresh = await api("get", { cartId }); // ← берём финальные суммы
-    setCart(fresh);
+    // 1) ответ мутации уже содержит корректный total для большинства случаев
+    const updated = await api("update", { cartId, lineId, quantity: qty });
+    setCart(updated);
+
+    // 2) контрольный рефетч (на случай запаздывания расчётов на стороне Shopify)
+    setTimeout(async () => {
+      const fresh = await api("get", { cartId });
+      setCart(fresh);
+    }, 200);
   } finally {
     setLoadingId(null);
   }
@@ -46,9 +52,13 @@ export default function CartPage() {
   if (!cartId) return;
   setLoadingId(lineId);
   try {
-    await api("remove", { cartId, lineId });
-    const fresh = await api("get", { cartId }); // ← берём финальные суммы
-    setCart(fresh);
+    const updated = await api("remove", { cartId, lineId });
+    setCart(updated);
+
+    setTimeout(async () => {
+      const fresh = await api("get", { cartId });
+      setCart(fresh);
+    }, 200);
   } finally {
     setLoadingId(null);
   }
