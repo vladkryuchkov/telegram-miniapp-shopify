@@ -144,8 +144,9 @@ export default function CartPage() {
 
           <div className="cart-summary">
             <div className="sum">
-              Total: {cart?.cost?.subtotalAmount?.amount} {cart?.cost?.subtotalAmount?.currencyCode}
-            </div>
+  Total: {cart?.cost?.totalAmount?.amount} {cart?.cost?.totalAmount?.currencyCode}
+</div>
+
             <div className="cart-actions">
               <button onClick={back}>Back</button>
               <button onClick={checkout} disabled={!cart?.checkoutUrl}>Go to checkout</button>
