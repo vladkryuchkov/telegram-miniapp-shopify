@@ -9,9 +9,22 @@ async function api(action, payload = {}) {
   return res.json();
 }
 
+import { useEffect, useRef, useState } from "react";
+
+function parseAmount(a) { return Number.parseFloat(a || "0") || 0; }
+
+function computeFallbackTotal(cart) {
+  const edges = cart?.lines?.edges || [];
+  if (!edges.length) return null;
+  const currency = edges[0]?.node?.cost?.subtotalAmount?.currencyCode || cart?.cost?.totalAmount?.currencyCode;
+  const sum = edges.reduce((acc, { node }) => acc + parseAmount(node?.cost?.subtotalAmount?.amount), 0);
+  return { amount: sum.toFixed(2), currencyCode: currency || "USD" };
+}
+
 export default function CartPage() {
   const [cart, setCart] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
+  const opRef = useRef(0);
 
   useEffect(() => {
     const saved = localStorage.getItem("cartId");
@@ -32,18 +45,18 @@ export default function CartPage() {
   if (!cartId) return;
   const qty = Math.max(1, Math.min(999, Number(nextQty) || 1));
   setLoadingId(lineId);
-  try {
-    // 1) ответ мутации уже содержит корректный total для большинства случаев
-    const updated = await api("update", { cartId, lineId, quantity: qty });
-    setCart(updated);
 
-    // 2) контрольный рефетч (на случай запаздывания расчётов на стороне Shopify)
-    setTimeout(async () => {
-      const fresh = await api("get", { cartId });
-      setCart(fresh);
-    }, 200);
+  const myOp = ++opRef.current;
+  try {
+    // шаг 1: мгновенно применяем ответ мутации
+    const updated = await api("update", { cartId, lineId, quantity: qty });
+    if (myOp === opRef.current) setCart(updated);
+
+    // шаг 2: контрольный рефетч (гарантия корректного total)
+    const fresh = await api("get", { cartId, _ts: Date.now() });
+    if (myOp === opRef.current) setCart(fresh);
   } finally {
-    setLoadingId(null);
+    if (myOp === opRef.current) setLoadingId(null);
   }
 }
 
@@ -51,16 +64,16 @@ export default function CartPage() {
   const cartId = cart?.id;
   if (!cartId) return;
   setLoadingId(lineId);
+
+  const myOp = ++opRef.current;
   try {
     const updated = await api("remove", { cartId, lineId });
-    setCart(updated);
+    if (myOp === opRef.current) setCart(updated);
 
-    setTimeout(async () => {
-      const fresh = await api("get", { cartId });
-      setCart(fresh);
-    }, 200);
+    const fresh = await api("get", { cartId, _ts: Date.now() });
+    if (myOp === opRef.current) setCart(fresh);
   } finally {
-    setLoadingId(null);
+    if (myOp === opRef.current) setLoadingId(null);
   }
 }
 
@@ -154,9 +167,19 @@ export default function CartPage() {
 
           {cart?.lines?.edges?.length ? (
   <div className="cart-summary">
+   {(() => {
+  const apiTotal = cart?.cost?.totalAmount;
+  const fallback = computeFallbackTotal(cart);
+  const show = (apiTotal?.amount ? apiTotal : fallback);
+  return (
     <div className="sum">
-      Total: {cart?.cost?.totalAmount?.amount} {cart?.cost?.totalAmount?.currencyCode}
+      Total: {show?.amount} {show?.currencyCode}
     </div>
+  );
+})()}
+  // <div className="sum">
+   //   Total: {cart?.cost?.totalAmount?.amount} {cart?.cost?.totalAmount?.currencyCode}
+   // </div>
     <div className="cart-actions">
       <button onClick={back}>Back</button>
       <button onClick={checkout} disabled={!cart?.checkoutUrl}>Go to checkout</button>
