@@ -127,7 +127,33 @@ export default function CartPage() {
           </div>
         </>
       )}
+<div className="bottom-spacer" />
+<nav className="bottom-nav" role="navigation" aria-label="Bottom navigation">
+  <a
+    className="nav-item"
+    href="/"
+    aria-label="Back to catalog"
+    onClick={(e) => { e.preventDefault(); window.location.href = '/'; }}
+  >
+    {/* Можно сделать «домой» или снова корзину — на ваше усмотрение */}
+    {typeof window !== 'undefined' && document?.createElement ? (
+      <img src="/cart.svg" alt="Catalog" className="nav-icon" onError={(e)=>{e.currentTarget.outerHTML='🏠'}} />
+    ) : '🏠'}
+    <div className="nav-label">Catalog</div>
+  </a>
 
+  <a
+    className="nav-item active"
+    href="#checkout"
+    aria-label="Go to checkout"
+    onClick={(e) => { e.preventDefault(); checkout(); }}
+  >
+    {typeof window !== 'undefined' && document?.createElement ? (
+      <img src="/checkout.svg" alt="Checkout" className="nav-icon" onError={(e)=>{e.currentTarget.outerHTML='💳'}} />
+    ) : '💳'}
+    <div className="nav-label">Checkout</div>
+  </a>
+</nav>
       <script src="https://telegram.org/js/telegram-web-app.js"></script>
     </main>
   );
