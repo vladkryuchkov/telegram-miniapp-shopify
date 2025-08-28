@@ -27,30 +27,32 @@ export default function CartPage() {
     else window.location.href = "/";
   }
 
-  async function changeQty(lineId, nextQty) {
-    const cartId = cart?.id;
-    if (!cartId) return;
-    const qty = Math.max(1, Math.min(999, Number(nextQty) || 1));
-    setLoadingId(lineId);
-    try {
-      const updated = await api("update", { cartId, lineId, quantity: qty });
-      setCart(updated); // в updated уже есть cost и lines
-    } finally {
-      setLoadingId(null);
-    }
+ async function changeQty(lineId, nextQty) {
+  const cartId = cart?.id;
+  if (!cartId) return;
+  const qty = Math.max(1, Math.min(999, Number(nextQty) || 1));
+  setLoadingId(lineId);
+  try {
+    await api("update", { cartId, lineId, quantity: qty });
+    const fresh = await api("get", { cartId }); // ← берём финальные суммы
+    setCart(fresh);
+  } finally {
+    setLoadingId(null);
   }
+}
 
   async function removeLine(lineId) {
-    const cartId = cart?.id;
-    if (!cartId) return;
-    setLoadingId(lineId);
-    try {
-      const updated = await api("remove", { cartId, lineId });
-      setCart(updated); // сразу обновляем сумму и список
-    } finally {
-      setLoadingId(null);
-    }
+  const cartId = cart?.id;
+  if (!cartId) return;
+  setLoadingId(lineId);
+  try {
+    await api("remove", { cartId, lineId });
+    const fresh = await api("get", { cartId }); // ← берём финальные суммы
+    setCart(fresh);
+  } finally {
+    setLoadingId(null);
   }
+}
 
 
  function notify(text) {
