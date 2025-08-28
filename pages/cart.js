@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 async function api(action, payload = {}) {
   const res = await fetch("/api/cart", {
@@ -8,8 +8,6 @@ async function api(action, payload = {}) {
   });
   return res.json();
 }
-
-import { useEffect, useRef, useState } from "react";
 
 function parseAmount(a) { return Number.parseFloat(a || "0") || 0; }
 
