@@ -30,7 +30,7 @@ const PRODUCTS_PAGED_QUERY = `#graphql
 `;
 
 async function fetchAllProducts() {
-  const first = 100; // можно увеличить до 250
+  const first = 100; // you can raise to 250 (Storefront max)
   let after = null;
   let all = [];
 
@@ -48,14 +48,13 @@ async function fetchAllProducts() {
 export default function Home() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(null);
-  const [loadingId, setLoadingId] = useState(null); // чтобы дизейблить кнопку конкретной карточки
+  const [loadingId, setLoadingId] = useState(null);
   const [qty, setQty] = useState({}); // { [productId]: number }
 
   useEffect(() => {
     (async () => {
       const list = await fetchAllProducts();
       setProducts(list);
-      // дефолтное количество = 1
       const q = {};
       list.forEach(p => (q[p.id] = 1));
       setQty(q);
@@ -102,21 +101,23 @@ export default function Home() {
 
   function openCheckout() {
     if (!cart?.checkoutUrl) return;
-    window.location.href = cart.checkoutUrl; // открываем чекаут в том же WebView
+    window.location.href = cart.checkoutUrl; // open inside Telegram WebView
   }
 
   function changeQty(productId, value) {
-    const v = Math.max(1, Math.min(999, Number(value) || 1)); // 1..999
+    const v = Math.max(1, Math.min(999, Number(value) || 1));
     setQty(prev => ({ ...prev, [productId]: v }));
   }
 
   return (
     <main>
+      {/* Header with centered logo */}
       <div className="header">
-  <img src="/logo.png" alt="Логотип" className="logo" />
-</div>
+        <img src="/logo.png" alt="Logo" className="logo" />
+      </div>
+
       {products.length === 0 ? (
-        <div className="empty">Загружаю товары…</div>
+        <div className="empty">Loading products…</div>
       ) : (
         <div className="grid">
           {products.map((p) => {
@@ -133,13 +134,13 @@ export default function Home() {
                 <h3>{p.title}</h3>
                 <div className="price">{price ? `${price.amount} ${price.currencyCode}` : ""}</div>
 
-                {/* Блок выбора количества */}
+                {/* quantity selector */}
                 <div className="qty">
                   <button
                     type="button"
                     className="qty-btn"
                     onClick={() => changeQty(p.id, currentQty - 1)}
-                    aria-label="Минус"
+                    aria-label="Minus"
                   >−</button>
                   <input
                     type="number"
@@ -153,7 +154,7 @@ export default function Home() {
                     type="button"
                     className="qty-btn"
                     onClick={() => changeQty(p.id, currentQty + 1)}
-                    aria-label="Плюс"
+                    aria-label="Plus"
                   >+</button>
                 </div>
 
@@ -161,7 +162,7 @@ export default function Home() {
                   disabled={loading || !variant?.id}
                   onClick={() => addToCart(variant.id, p.id)}
                 >
-                  {loading ? "Добавление…" : "В корзину"}
+                  {loading ? "Adding…" : "Add to cart"}
                 </button>
               </div>
             );
@@ -170,13 +171,13 @@ export default function Home() {
       )}
       <div className="footer-spacer" />
       <div className="actions two">
-  <button onClick={() => (window.location.href = '/cart')}>
-    Корзина {cart?.totalQuantity ? `(${cart.totalQuantity})` : ''}
-  </button>
-  <button onClick={openCheckout} disabled={!cart?.checkoutUrl}>
-    Перейти к оплате
-  </button>
-</div>
+        <button onClick={() => (window.location.href = '/cart')}>
+          Cart {cart?.totalQuantity ? `(${cart.totalQuantity})` : ''}
+        </button>
+        <button onClick={openCheckout} disabled={!cart?.checkoutUrl}>
+          Go to checkout
+        </button>
+      </div>
       <script src="https://telegram.org/js/telegram-web-app.js"></script>
     </main>
   );
