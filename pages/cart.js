@@ -142,16 +142,22 @@ export default function CartPage() {
             <div className="empty">Your cart is empty.</div>
           )}
 
-          <div className="cart-summary">
-            <div className="sum">
-  Total: {cart?.cost?.totalAmount?.amount} {cart?.cost?.totalAmount?.currencyCode}
-</div>
-
-            <div className="cart-actions">
-              <button onClick={back}>Back</button>
-              <button onClick={checkout} disabled={!cart?.checkoutUrl}>Go to checkout</button>
-            </div>
-          </div>
+          {cart?.lines?.edges?.length ? (
+  <div className="cart-summary">
+    <div className="sum">
+      Total: {cart?.cost?.totalAmount?.amount} {cart?.cost?.totalAmount?.currencyCode}
+    </div>
+    <div className="cart-actions">
+      <button onClick={back}>Back</button>
+      <button onClick={checkout} disabled={!cart?.checkoutUrl}>Go to checkout</button>
+    </div>
+  </div>
+) : (
+  <div className="empty">
+    Your cart is empty.<br />
+    <button onClick={back} style={{ marginTop: 10 }}>Back to catalog</button>
+  </div>
+)}
         </>
       )}
 <div className="bottom-spacer" />
