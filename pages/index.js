@@ -44,6 +44,24 @@ async function fetchAllProducts() {
   }
   return all;
 }
+async function apiCart(action, payload = {}) {
+  const res = await fetch("/api/cart", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, ...payload }),
+  });
+  return res.json();
+}
+
+async function fetchCartById(cartId) {
+  if (!cartId) return null;
+  try {
+    const cart = await apiCart("get", { cartId });
+    return cart;
+  } catch {
+    return null;
+  }
+}
 
 export default function Home() {
   const [products, setProducts] = useState([]);
