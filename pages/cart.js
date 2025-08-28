@@ -54,9 +54,35 @@ export default function CartPage() {
     }
   }
 
-  function checkout() {
-    if (cart?.checkoutUrl) window.location.href = cart.checkoutUrl;
-  }
+
+ function notify(text) {
+   if (window.Telegram?.WebApp?.showPopup) {
+     window.Telegram.WebApp.showPopup({
+       title: "Oops",
+       message: text,
+       buttons: [{ type: "close" }],
+     });
+     return;
+   }
+   if (window.Telegram?.WebApp?.showAlert) {
+     window.Telegram.WebApp.showAlert(text);
+     return;
+   }
+   alert(text);
+ }
+
+ function checkout() {
+   if (!cart || !cart.totalQuantity) {
+     notify("Your cart is empty");
+     return;
+   }
+   if (!cart.checkoutUrl) {
+     notify("Checkout link is not ready yet");
+     return;
+   }
+   window.location.href = cart.checkoutUrl;
+ }
+
 
   return (
     <main>
