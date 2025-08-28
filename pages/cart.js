@@ -34,7 +34,6 @@ export default function CartPage() {
     setLoadingId(lineId);
     try {
       const updated = await api("update", { cartId, lineId, quantity: qty });
-      // подтянем свежие данные корзины
       const fresh = await api("get", { cartId: updated.id });
       setCart(fresh);
     } finally {
@@ -61,12 +60,16 @@ export default function CartPage() {
 
   return (
     <main>
-      <h1>Корзина</h1>
+      <div className="header">
+        <img src="/logo.png" alt="Logo" className="logo" />
+      </div>
+
+      <h1>Cart</h1>
 
       {!cart ? (
         <div className="empty">
-          Корзина пуста. <br />
-          <button onClick={back} style={{ marginTop: 10 }}>Вернуться в каталог</button>
+          Your cart is empty. <br />
+          <button onClick={back} style={{ marginTop: 10 }}>Back to catalog</button>
         </div>
       ) : (
         <>
@@ -88,7 +91,7 @@ export default function CartPage() {
                       </div>
 
                       <div className="qty">
-                        <button className="qty-btn" onClick={() => changeQty(node.id, node.quantity - 1)} disabled={loadingId === node.id}>−</button>
+                        <button className="qty-btn" onClick={() => changeQty(node.id, node.quantity - 1)} disabled={loadingId === node.id} aria-label="Minus">−</button>
                         <input
                           className="qty-input"
                           type="number"
@@ -98,11 +101,11 @@ export default function CartPage() {
                           onChange={(e) => changeQty(node.id, e.target.value)}
                           disabled={loadingId === node.id}
                         />
-                        <button className="qty-btn" onClick={() => changeQty(node.id, node.quantity + 1)} disabled={loadingId === node.id}>+</button>
+                        <button className="qty-btn" onClick={() => changeQty(node.id, node.quantity + 1)} disabled={loadingId === node.id} aria-label="Plus">+</button>
                       </div>
 
                       <button className="remove-btn" onClick={() => removeLine(node.id)} disabled={loadingId === node.id}>
-                        Удалить
+                        Remove
                       </button>
                     </div>
                   </div>
@@ -110,16 +113,16 @@ export default function CartPage() {
               })}
             </div>
           ) : (
-            <div className="empty">В корзине пока нет товаров.</div>
+            <div className="empty">Your cart is empty.</div>
           )}
 
           <div className="cart-summary">
             <div className="sum">
-              Итого: {cart?.cost?.subtotalAmount?.amount} {cart?.cost?.subtotalAmount?.currencyCode}
+              Total: {cart?.cost?.subtotalAmount?.amount} {cart?.cost?.subtotalAmount?.currencyCode}
             </div>
             <div className="cart-actions">
-              <button onClick={back}>Назад</button>
-              <button onClick={checkout} disabled={!cart?.checkoutUrl}>Перейти к оплате</button>
+              <button onClick={back}>Back</button>
+              <button onClick={checkout} disabled={!cart?.checkoutUrl}>Go to checkout</button>
             </div>
           </div>
         </>
